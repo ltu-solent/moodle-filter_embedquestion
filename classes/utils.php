@@ -114,11 +114,11 @@ abstract class utils {
     //             [$context->id, $DB->sql_like_escape($idnumber)]);
     // }
     $record = $DB->get_records_sql("
-    SELECT qc.id FROM question_categories qc
+    SELECT qc.id FROM mdl_question_categories qc
 
     WHERE id='$categoryid';");
-    
-    return array_column($record, 'id'); 
+
+    return array_column($record, 'id');
 
 }
 
@@ -167,9 +167,9 @@ abstract class utils {
         $categories = $DB->get_records_sql("
         SELECT qc.id AS id, qc.name, COUNT(q.id) AS count
 
-        FROM question_categories qc
+        FROM mdl_question_categories qc
 
-        JOIN question q ON q.category = qc.id
+        JOIN mdl_question q ON q.category = qc.id
 
         GROUP BY qc.id");
 
@@ -179,8 +179,8 @@ abstract class utils {
             $choices[$category->id] = get_string('nameandcount', 'filter_embedquestion',
                     ['name' => format_string($category->name), 'count' => $category->count]);
         }
-        
- 
+
+
 
         return $choices;
     }
@@ -213,8 +213,8 @@ abstract class utils {
 
         $questions = $DB->get_records_sql("
         SELECT q.id, q.name
-        FROM question q
-        JOIN question_categories qc ON q.category = qc.id
+        FROM mdl_question q
+        JOIN mdl_question_categories qc ON q.category = qc.id
         WHERE qc.id = $categoryid
         ORDER BY q.name");
 

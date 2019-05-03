@@ -158,7 +158,7 @@ abstract class utils {
 
         $creatortest = '';
         if ($userid) {
-            $creatortest = 'AND q.createdby = ?';
+            $creatortest = "AND q.createdby = {$userid}";
             $params[] = $userid;
         }
         $params[] = $context->id;
@@ -171,7 +171,11 @@ abstract class utils {
 
         JOIN mdl_question q ON q.category = qc.id
 
-        GROUP BY qc.id");
+        WHERE qc.contextid = $context->id 
+        $creatortest
+
+        GROUP BY qc.id
+        ORDER BY qc.name");
 
         $choices = ['' => get_string('choosedots')];
         foreach ($categories as $category) {

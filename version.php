@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018111900;
+$plugin->version   = 2019050800;
 $plugin->requires  = 2017110800;
 $plugin->component = 'filter_embedquestion';
 $plugin->maturity  = MATURITY_STABLE;

@@ -109,14 +109,14 @@ abstract class utils {
      */
     public static function get_category_by_idnumber(\context $context, $categoryid) {
         global $DB;
-    //     return $DB->get_record_select('question_categories',
-    //             'contextid = ? AND ' . $DB->sql_like('name', '?'),
-    //             [$context->id, $DB->sql_like_escape($idnumber)]);
-    // }
-    $record = $DB->get_records_sql("
-    SELECT qc.id FROM mdl_question_categories qc
 
-    WHERE id='$categoryid';");
+        $params = [];
+        $params[] = $categoryid;
+
+    $record = $DB->get_records_sql("
+    SELECT qc.id FROM {question_categories} qc
+
+    WHERE id=?", $params);
 
     return array_column($record, 'id');
 
@@ -154,28 +154,26 @@ abstract class utils {
         global $DB;
 
         $params = [];
-        $params[] = '%[ID:%]%';
+        $params[] = $context->id;
 
         $creatortest = '';
         if ($userid) {
-            $creatortest = "AND q.createdby = {$userid}";
+            $creatortest = "AND q.createdby = ?";
             $params[] = $userid;
         }
-        $params[] = $context->id;
-        $params[] = '%[ID:%]%';
 
         $categories = $DB->get_records_sql("
         SELECT qc.id AS id, qc.name, COUNT(q.id) AS count
 
-        FROM mdl_question_categories qc
+        FROM {question_categories} qc
 
-        JOIN mdl_question q ON q.category = qc.id
+        JOIN {question} q ON q.category = qc.id
 
-        WHERE qc.contextid = $context->id 
+        WHERE qc.contextid = $context->id
         $creatortest
 
         GROUP BY qc.id
-        ORDER BY qc.name");
+        ORDER BY qc.name", $params);
 
         $choices = ['' => get_string('choosedots')];
         foreach ($categories as $category) {
@@ -205,29 +203,18 @@ abstract class utils {
     public static function get_sharable_question_choices($categoryid, $userid = null) {
         global $DB;
 
-        // $params = [];
-        // $params[] = $categoryid;
-        // $params[] = '%[ID:%]%';
-        //
-        // $creatortest = '';
-        // if ($userid) {
-        //     $creatortest = 'AND q.createdby = ?';
-        //     $params[] = $userid;
-        // }
+        $params = [];
+        $params[] = $categoryid;
 
         $questions = $DB->get_records_sql("
         SELECT q.id, q.name
-        FROM mdl_question q
-        JOIN mdl_question_categories qc ON q.category = qc.id
-        WHERE qc.id = $categoryid
-        ORDER BY q.name");
+        FROM {question} q
+        JOIN {question_categories} qc ON q.category = qc.id
+        WHERE qc.id = ?
+        ORDER BY q.name", $params);
 
         $choices = ['' => get_string('choosedots')];
         foreach ($questions as $question) {
-            // if (!preg_match('~\[ID:(.*)\]~', $question->name, $matches)) {
-            //     continue;
-            // }
-
             $choices[$question->id] = format_string($question->name);
         }
 
